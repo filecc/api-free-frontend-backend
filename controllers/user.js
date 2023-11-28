@@ -135,8 +135,20 @@ async function isLogged(req, res, next){
   }
 }
 
+/**
+ * @param {express.Request} req
+ * @param {express.Response} res
+ */
+async function logout(req, res, next){
+  res.clearCookie('pl-token').json({
+    code: 200,
+    message: "User logged out"
+  })
+}
+
 module.exports = {
   register,
   login,
-  isLogged
+  isLogged,
+  logout
 };

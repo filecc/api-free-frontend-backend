@@ -156,7 +156,7 @@ async function show(req, res, next) {
       }
     }).then((users) => {
       const imgPath = `http://${host}:${port}/images${post.image}`;
-      const downloadLink = `http://localhost:3000/posts/${post.slug}/download`;
+      const downloadLink = `http://${host}:${port}/posts/${post.slug}/download`;
      const user = users.find((user) => user.id === post.postedById)
       
       res.json({
@@ -193,15 +193,15 @@ async function store (req, res, next) {
   let imageSlug;
 
   const slug = await slugGenerator(data.title)
-
+  const tags = JSON.parse(data.tags)
   const newPost = new Post(
     data.title, 
     slug,
     data.content,
     data.published === "true" ? true : false,
-    imageSlug ?? '/placeholder.webp',
+    imageSlug ?? '/placeholder.jpg',
     parseInt(data.category),
-    data.tags,
+    tags,
     id
     )
 

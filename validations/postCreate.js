@@ -9,8 +9,13 @@ const prisma = new PrismaClient();
 module.exports = {
     title: {
         in: ["body"],
+        isLength: {
+            options: { min: 5, bail: true },
+            errorMessage: 'Title must be at least 5 characters long.',
+        },
         isString: true,
-        errorMessage: 'Title must be provided and has to be a string.'
+        errorMessage: 'Title must be provided and has to be a string.',
+        
     },
     content: {
         in: ["body"],
@@ -58,10 +63,10 @@ module.exports = {
     }, 
     tags: {
         in: ["body"],
-        isArray: {
+        /* isArray: {
             bail: true,
             errorMessage: 'Tags must be provided and have to be an array.',
-        },
+        }, */
     }
     
     
