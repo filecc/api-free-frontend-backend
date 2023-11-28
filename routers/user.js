@@ -12,6 +12,7 @@ const doubleMiddlewareLogin = [multer().none(), checkSchema(userLogin)]
 router.post("/register", doubleMiddlewareRegister, userController.register)
 router.post("/login", doubleMiddlewareLogin, userController.login)
 router.get("/isLogged", userController.isLogged)
+router.get("/logout", userController.logout)
 
 
 
