@@ -37,7 +37,7 @@ async function index(req, res, next) {
         tags: true
       }
     })
-    .then((posts) => {
+    .then(async (posts) => {
       const parsedStart = parseInt(startIndex)
       const parsedMax = parseInt(maxResult)
       const totalResults = posts.length
@@ -53,21 +53,32 @@ async function index(req, res, next) {
       const nextPage = newIndex 
       ? `http://${host}:${port}/api/posts?maxResult=${parsedMax}&startIndex=${newIndex}` 
       : null
-      
-      res.json({
-        totalResults: posts.length,
-        nextPage: nextPage,
-        posts: posts.slice(startIndex, possibleLimit).map((post) => {
-          const tags = post.tags.map((tag) => {
-            return tag.name
+      await prisma.user.findMany({
+        select: {
+          id: true, 
+          name: true,
+          email: true
+        }
+      }).then((users) => {
+        
+        res.json({
+          totalResults: posts.length,
+          nextPage: nextPage,
+          posts: posts.slice(startIndex, possibleLimit).map((post) => {
+            const user = users.find((user) => user.id === post.postedById)
+            const tags = post.tags.map((tag) => {
+              return tag.name
+            })
+            return [{
+              ...post, 
+              author: {name: user?.name, email: user?.email},
+              tags: tags
+            }]
           })
-          return [{
-            ...post, 
-            tags: tags
-          }]
         })
+        return
       })
-      return
+      
     })
     .catch((error) => {
       next(new CustomError(404, error.message))
@@ -87,28 +98,39 @@ async function index(req, res, next) {
       }
     }
   })
-  .then((posts) => {
-    if (posts.lenght === 0) {
-      next(new CustomError(404, `No posts found`))
-      return
-    }
-
-    const postsToReturn = posts.map((post) => {
-      return {
-        ...post,
-        tags: post.tags.map((tag) => tag.name)
+  .then(async (posts) => {
+    await prisma.user.findMany({
+      select: {
+        id: true, 
+        name: true,
+        email: true
       }
-    });
-    res.json(postsToReturn)
+    }).then((users) => {
+      
+      if (posts.lenght === 0) {
+        next(new CustomError(404, `No posts found`))
+        return
+      }
+     
+      const postsToReturn = posts.map((post) => {
+        const user = users.find((user) => user.id === post.postedById)
+        return {
+          ...post,
+          author: {name: user?.name, email: user?.email},
+          tags: post.tags.map((tag) => tag.name)
+        }
+      });
+      res.json(postsToReturn)
+      
+  
+      return 
+    })
     
-
-    return
   })
   .catch((error) => {
     next(new CustomError(404, error.message))
     return
   })
-  
   
   
 }
@@ -119,18 +141,32 @@ async function show(req, res, next) {
       slug: req.params.slug
     }
   })
-  .then((post) => {
+  .then(async (post) => {
     if (!post) {
       next(new CustomError(404, `Post with slug ${req.params.slug} not found`))
       return
     }
-    const imgPath = `http://${host}:${port}/images${post.image}`;
-    const downloadLink = `http://localhost:3000/posts/${post.slug}/download`;
-    res.json({
-      ...post,
-      image_url: `${imgPath}`,
-      download_link: `${downloadLink}`,
-    });
+    await prisma.user.findMany({
+      select: {
+        name: true,
+        email: true,
+        id: true
+      }
+    }).then((users) => {
+      const imgPath = `http://${host}:${port}/images${post.image}`;
+      const downloadLink = `http://localhost:3000/posts/${post.slug}/download`;
+     const user = users.find((user) => user.id === post.postedById)
+      
+      res.json({
+        ...post,
+        author: {name: user?.name, email: user?.email},
+        image_url: `${imgPath}`,
+        download_link: `${downloadLink}`,
+      });
+    })
+    
+
+    
   })
   .catch((error) => {
     next(new CustomError(404, error.message))
