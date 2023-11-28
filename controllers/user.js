@@ -14,6 +14,7 @@ const FRONT = process.env.FRONTURL
  */
 
 async function register(req, res, next) {
+
   const validation = validationResult(req);
   if (!validation.isEmpty()) {
     next(new CustomErrorValidation("Some errors", 500, validation.array()));
@@ -79,12 +80,63 @@ async function login(req, res, next){
       expiresIn: "1h"
     })
 
-    res.cookie('pl-token', token, {
+    res.status(200).cookie('pl-token', token, {
         expires: new Date(Date.now() + 3600000)
-    }).redirect(FRONT + '/user/profile')
+    }).json({
+        code: 200,
+        message: "User logged in",
+        name: user.name,
+        email: user.email,
+        role: user.role
+    })
+}
+
+async function isLogged(req, res, next){
+  const token = req.cookies['pl-token']
+  if(!token){
+    res.json({
+      code: 401,
+      message: "Not logged"
+    })
+    return;
+  }
+  try{
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    if(!decoded){
+      res.json({
+        code: 401,
+        message: "Not logged"
+      })
+      return;
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        email: decoded.email
+      }
+    })
+    if(!user){
+      res.json({
+        code: 401,
+        message: "Not logged"
+      })
+      return;
+    }
+    res.status(200).json({
+      code: 200,
+      message: "isValid",
+     
+    })
+  }catch(err){
+    res.json({
+      code: 401,
+      message: "Not logged"
+    })
+    return;
+  }
 }
 
 module.exports = {
   register,
-  login
+  login,
+  isLogged
 };

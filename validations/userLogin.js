@@ -20,7 +20,7 @@ module.exports = {
   password: {
     in: ["body"],
     isLength: {
-      options: { min: 8 },
+      options: { min: 1 },
       errorMessage: "Password missing.",
     }
   }

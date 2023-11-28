@@ -20,7 +20,7 @@ const corsOptions = {
   optionSuccessStatus: 200,
   methods: 'GET,POST,PUT'
 }
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json())
 app.use(express.static('public'))
 

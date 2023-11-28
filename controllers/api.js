@@ -75,7 +75,9 @@ async function index(req, res, next) {
               tags: tags
             }]
           })
-        })
+          
+        }
+        )
         return
       })
       
