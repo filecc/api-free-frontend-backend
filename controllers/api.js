@@ -164,6 +164,7 @@ async function show(req, res, next) {
       res.json({
         ...post,
         author: {name: user?.name, email: user?.email},
+        image: imgPath,
         image_url: `${imgPath}`,
         download_link: `${downloadLink}`,
       });
