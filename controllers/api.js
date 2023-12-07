@@ -72,7 +72,8 @@ async function index(req, res, next) {
             return [{
               ...post, 
               author: {name: user?.name, email: user?.email},
-              tags: tags
+              tags: post.tags.map((tag) => tag.name),
+              image: `http://${host}:${port}/images${post.image}`,
             }]
           })
           
@@ -119,7 +120,8 @@ async function index(req, res, next) {
         return {
           ...post,
           author: {name: user?.name, email: user?.email},
-          tags: post.tags.map((tag) => tag.name)
+          tags: post.tags.map((tag) => tag.name),
+          image: `http://${host}:${port}/images${post.image}`,
         }
       });
       res.json(postsToReturn)
@@ -193,7 +195,7 @@ async function store (req, res, next) {
   let imageSlug;
 
   const slug = await slugGenerator(data.title)
-  const tags = JSON.parse(data.tags)
+  const tags = data.tags
   const newPost = new Post(
     data.title, 
     slug,

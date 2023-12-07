@@ -63,10 +63,10 @@ module.exports = {
     }, 
     tags: {
         in: ["body"],
-        /* isArray: {
+        isArray: {
             bail: true,
             errorMessage: 'Tags must be provided and have to be an array.',
-        }, */
+        },
     }
     
     

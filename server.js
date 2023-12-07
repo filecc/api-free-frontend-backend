@@ -15,7 +15,7 @@ const userRouter = require('./routers/user')
 
 app.get('/favicon.ico', (req, res) => res.status(204))
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:3000',
   credentials: true,
   optionSuccessStatus: 200,
   methods: 'GET,POST,PUT'

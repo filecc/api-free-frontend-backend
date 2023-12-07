@@ -67,6 +67,8 @@ async function login(req, res, next){
       return;
     }
 
+
+
     const passwordMatch = await comparePassword(password, user.password)
     if(!passwordMatch){
       next(new CustomErrorValidation("Wrong credentials", 401));
@@ -81,7 +83,8 @@ async function login(req, res, next){
     })
 
     res.status(200).cookie('pl-token', token, {
-        expires: new Date(Date.now() + 3600000)
+        expires: new Date(Date.now() + 3600000),
+        path: '/',
     }).json({
         code: 200,
         message: "User logged in",
